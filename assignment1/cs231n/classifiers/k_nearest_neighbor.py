@@ -124,6 +124,8 @@ class KNearestNeighbor(object):
     #new_observation = X[:,np.newaxis,:] 
     #new_train = self.X_train[np.newaxis,:,:]
     #dists = np.sqrt(np.sum(np.square(new_observation-new_train), axis=2))
+    #print num_train
+    #print self.X_train.shape
     train_square = np.sum(np.square(self.X_train), axis=1).reshape(1, num_train)
     test_square = np.sum(np.square(X), axis=1).reshape(num_test,1)
     # print 'f'
