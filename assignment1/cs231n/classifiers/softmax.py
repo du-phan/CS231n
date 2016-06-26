@@ -22,14 +22,37 @@ def softmax_loss_naive(W, X, y, reg):
   # Initialize the loss and gradient to zero.
   loss = 0.0
   dW = np.zeros_like(W)
-
+  num_train = X.shape[0]
+  num_class = W.shape[1]
+  score = np.zeros([num_train, num_class])
+  dscore = np.zeros_like(score)
   #############################################################################
   # TODO: Compute the softmax loss and its gradient using explicit loops.     #
   # Store the loss in loss and the gradient in dW. If you are not careful     #
   # here, it is easy to run into numeric instability. Don't forget the        #
   # regularization!                                                           #
   #############################################################################
-  pass
+  for train_index in xrange(num_train):
+    exp_sum = 0
+    for class_index in xrange(num_class): 
+      temp_exp = np.exp(W.T[class_index].dot(X[train_index]))
+      score[train_index, class_index] = temp_exp
+      exp_sum +=  temp_exp
+    score[train_index] /= exp_sum
+    dscore[train_index] = score[train_index]
+    score[train_index] = -np.log(score[train_index])
+     
+     
+
+  loss_vector = score[np.arange(num_train), y]
+  loss = np.sum(loss_vector) 
+  loss /= num_train
+  loss += .5 * np.sum(np.square(W))
+
+  dscore[np.arange(num_train), y] -= 1
+  dW = X.T.dot(dscore)
+  dW /= num_train
+  dW += reg * W
   #############################################################################
   #                          END OF YOUR CODE                                 #
   #############################################################################
@@ -46,14 +69,33 @@ def softmax_loss_vectorized(W, X, y, reg):
   # Initialize the loss and gradient to zero.
   loss = 0.0
   dW = np.zeros_like(W)
-
+  num_train = X.shape[0]
+  num_class = W.shape[1]
+  score = np.zeros([num_train, num_class])
+  dscore = np.zeros_like(score)
   #############################################################################
   # TODO: Compute the softmax loss and its gradient using no explicit loops.  #
   # Store the loss in loss and the gradient in dW. If you are not careful     #
   # here, it is easy to run into numeric instability. Don't forget the        #
   # regularization!                                                           #
   #############################################################################
-  pass
+  score = np.dot(X,W)
+  score = np.exp(score)
+  row_sum = np.sum(score, axis=1).reshape(num_train,-1)
+  score /= row_sum
+  dscore = score
+  score = -np.log(score)
+
+  loss_vector = score[np.arange(num_train), y]
+  loss = np.sum(loss_vector) 
+  loss /= num_train
+  loss += .5 * np.sum(np.square(W))
+
+  dscore[np.arange(num_train), y] -= 1
+  dW = X.T.dot(dscore)
+  dW /= num_train
+  dW += reg * W
+
   #############################################################################
   #                          END OF YOUR CODE                                 #
   #############################################################################
